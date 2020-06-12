@@ -23,10 +23,10 @@ import org.junit.Test;
  * Unit tests for the {@link OSSUnderFileSystemFactory}.
  */
 public class OSSUnderFileSystemFactoryTest {
-
   /**
    * Tests that the OSS UFS module correctly accepts paths that begin with oss://.
    */
+
   @Test
   public void factory() {
     UnderFileSystemFactory factory = UnderFileSystemFactoryRegistry.find("oss://test-bucket/path",

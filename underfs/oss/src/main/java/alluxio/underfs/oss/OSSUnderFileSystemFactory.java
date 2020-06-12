@@ -38,8 +38,7 @@ public class OSSUnderFileSystemFactory implements UnderFileSystemFactory {
 
   @Override
   public UnderFileSystem create(String path, UnderFileSystemConfiguration conf) {
-    Preconditions.checkNotNull(path, "path");
-
+    Preconditions.checkArgument(path != null, "path may not be null");
     if (checkOSSCredentials(conf)) {
       try {
         return OSSUnderFileSystem.createInstance(new AlluxioURI(path), conf);
