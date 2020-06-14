@@ -22,6 +22,7 @@
   <description>Aliyun OSS Under File System implementation</description>
 
   <properties>
+    <oss.hadoop.version>3.2.1</oss.hadoop.version>
     <!-- The following paths need to be defined here as well as in the parent pom so that mvn can -->
     <!-- run properly from sub-project directories -->
     <build.path>${project.parent.parent.basedir}/build</build.path>
@@ -37,8 +38,28 @@
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
     </dependency>
-
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-common</artifactId>
+      <version>${oss.hadoop.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-aliyun</artifactId>
+      <version>${oss.hadoop.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.aliyun.oss</groupId>
+          <artifactId>aliyun-sdk-oss</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
     <!-- Internal dependencies -->
+    <dependency>
+      <groupId>org.alluxio</groupId>
+      <artifactId>alluxio-underfs-hdfs</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.alluxio</groupId>
       <artifactId>alluxio-core-common</artifactId>
@@ -61,6 +82,37 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>shade</id>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <filters>
+                <filter>
+                  <artifact>*:*</artifact>
+                  <excludes>
+                    <exclude>LICENSE</exclude>
+                    <exclude>META-INF/LICENSE</exclude>
+                    <exclude>META-INF/*.SF</exclude>
+                    <exclude>META-INF/*.DSA</exclude>
+                    <exclude>META-INF/*.RSA</exclude>
+                    <!-- Because this module depends on alluxio-underfs-hdfs, eliminate HDFS factory implementation -->
+                    <exclude>alluxio/underfs/hdfs/HdfsUnderFileSystemFactory.*</exclude>
+                  </excludes>
+                </filter>
+                <filter>
+                  <artifact>org.alluxio:alluxio-underfs-hdfs</artifact>
+                  <excludes>
+                    <exclude>META-INF/services/alluxio.underfs.UnderFileSystemFactory</exclude>
+                  </excludes>
+                </filter>
+              </filters>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>com.coderplus.maven.plugins</groupId>
